@@ -9,7 +9,7 @@ from rasterio.windows import from_bounds as window_from_bounds
 from PIL import Image
 
 
-def create_tiles(tile_file: str, bounding_box: list[float] | None = None, tile_size_in_meters: int = 30) -> None:
+def create_tiles(tile_file: str, bounding_box: list[float] | None = None, tile_size_in_meters: int = 100, tile_overlap: int = 20) -> None:
     source_stem = Path(tile_file).stem
     output_tiff_dir = Path("data/tiles") / source_stem / "tiff_tiles"
     output_jpg_dir = Path("data/tiles") / source_stem / "jpg_files"
@@ -40,8 +40,9 @@ def create_tiles(tile_file: str, bounding_box: list[float] | None = None, tile_s
         grid_east  = math.ceil(area_east   / tile_size_in_meters) * tile_size_in_meters
         grid_north = math.ceil(area_north  / tile_size_in_meters) * tile_size_in_meters
 
-        tile_origins_x = range(int(grid_west),  int(grid_east),  tile_size_in_meters)
-        tile_origins_y = range(int(grid_south), int(grid_north), tile_size_in_meters)
+        tile_step = tile_size_in_meters - tile_overlap
+        tile_origins_x = range(int(grid_west),  int(grid_east),  tile_step)
+        tile_origins_y = range(int(grid_south), int(grid_north), tile_step)
         total_tiles = len(tile_origins_x) * len(tile_origins_y)
         print(f"Writing up to {total_tiles} tiles ({len(tile_origins_x)}×{len(tile_origins_y)}) → {output_tiff_dir.parent}/")
 
